@@ -1,0 +1,8 @@
+# Keep the build context lean. Do NOT ignore .git — the gradle git-version
+# plugin needs it to compute the project version during the build.
+**/build/
+.gradle/
+**/.gradle/
+docs/.cache/
+.idea/
+**/*.iml
