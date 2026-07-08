@@ -38,8 +38,11 @@ WORKDIR /app
 # Copy the exploded classpath (the app jar + all dependency jars).
 COPY --from=build /workspace/app/build/install/app/lib /app/lib
 
-# Let the JVM size its heap from the container's memory limit.
-ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75.0"
+# Fast, low-footprint startup so the HTTP server binds before the platform's
+# liveness probe deadline (this app initialises a lot of beans on a @Context
+# bootstrapper before the server binds). -Xmx192m matches upstream's tested heap;
+# C1-only JIT (TieredStopAtLevel=1) and SerialGC cut startup time on a throttled CPU.
+ENV JAVA_TOOL_OPTIONS="-Xms64m -Xmx192m -XX:+UseSerialGC -XX:TieredStopAtLevel=1"
 
 EXPOSE 8080
 
